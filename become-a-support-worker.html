@@ -324,8 +324,12 @@ footer{padding:48px 0;border-top:1px solid var(--line);background:var(--bg-warm)
       <a href="become-a-support-worker.html">Become a support worker</a>
       <a href="index.html#how">How it works</a>
       <a href="index.html#faq">FAQ</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a href="data-security.html">Data security</a>
     </div>
-    <small>© 2026 Nimora Care Pty Ltd · Made for the NDIS sector in Australia</small>
+    <small>© 2026 Nimora Pty Ltd · Made for the NDIS sector in Australia · ABN 40 624 648 266 · ACN 699 396 239</small>
   </div>
 </footer>
 <script>
@@ -333,9 +337,313 @@ const hdr=document.getElementById('hdr');
 addEventListener('scroll',()=>hdr.classList.toggle('scrolled',scrollY>8),{passive:true});
 document.querySelectorAll('form').forEach(f=>f.addEventListener('submit',e=>{
   e.preventDefault();
-  const ok=f.querySelector('.form-ok'); if(ok){ok.classList.add('show');}
-  f.querySelectorAll('input,select,textarea').forEach(el=>{if(el.type!=='hidden')el.value='';});
+  const EMAIL='info@nimora.com.au';
+  const btn=f.querySelector('button[type=submit]'), ok=f.querySelector('.form-ok');
+  const data={_subject:'New website enquiry - '+document.title,_captcha:'false',_template:'table','Source page':document.title};
+  f.querySelectorAll('input,select,textarea').forEach(el=>{
+    const lab=f.querySelector('label[for="'+el.id+'"]');
+    data[(lab?lab.textContent:el.id||el.name||'Field').trim()]=el.value;
+    if(el.type==='email'&&el.value)data._replyto=el.value;
+  });
+  const label=btn?btn.textContent:'';
+  if(btn){btn.disabled=true;btn.textContent='Sending…';}
+  fetch('https://formsubmit.co/ajax/'+EMAIL,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(data)})
+  .then(r=>{if(!r.ok)throw 0;return r.json();})
+  .then(()=>{
+    if(ok){ok.textContent=ok.dataset.msg||ok.textContent;ok.classList.add('show');}
+    f.querySelectorAll('input,select,textarea').forEach(el=>{if(el.type!=='hidden')el.value='';});
+  })
+  .catch(()=>{alert('Sorry, we could not send your message. Please email us directly at '+EMAIL);})
+  .finally(()=>{if(btn){btn.disabled=false;btn.textContent=label;}});
 }));
+</script>
+
+<style>
+/* ============================================================
+   19. AI CHAT WIDGET (ported from landing replica)
+   ============================================================ */
+.chat-launcher{
+  position:fixed;bottom:26px;right:26px;z-index:300;width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(150deg,var(--green-600),var(--green-800));border:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 14px 32px -8px rgba(6,90,81,.55);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .25s var(--ease-spring),box-shadow .25s var(--ease);
+}
+.chat-launcher:hover{transform:scale(1.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 18px 40px -10px rgba(6,90,81,.6)}
+.chat-launcher svg{width:26px;height:26px;stroke:#fff}
+.chat-launcher .dot{position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:var(--amber);border-radius:50%;border:2.5px solid var(--bg)}
+.chat-launcher .ping{position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--green-500);opacity:0;animation:ping 2.6s ease-out infinite;pointer-events:none}
+@keyframes ping{0%{opacity:.5;transform:scale(.9)}100%{opacity:0;transform:scale(1.3)}}
+
+.chat-panel{
+  position:fixed;bottom:100px;right:26px;z-index:300;width:352px;max-width:calc(100vw - 40px);
+  background:var(--surface);border-radius:20px;box-shadow:var(--sh-lg);border:1px solid var(--line);
+  display:flex;flex-direction:column;overflow:hidden;max-height:min(540px,72vh);
+  opacity:0;visibility:hidden;transform:translateY(12px) scale(.97);transform-origin:bottom right;
+  transition:opacity .28s var(--ease),transform .28s var(--ease-spring),visibility .28s;
+}
+.chat-panel.open{opacity:1;visibility:visible;transform:none}
+.chat-head{background:linear-gradient(135deg,var(--green-700),var(--sec-deep) 70%,var(--green-950));color:#fff;padding:16px 18px;display:flex;align-items:center;gap:10px}
+.chat-head .av{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chat-head .av svg{width:17px;height:17px;stroke:#fff}
+.chat-head .ti{flex:1}
+.chat-head .ti .n{font-weight:700;font-size:14.5px;font-family:var(--f-display)}
+.chat-head .ti .s{font-size:11.5px;opacity:.85;display:flex;align-items:center;gap:5px}
+.chat-head .s::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green-300);display:inline-block;animation:blip 1.8s ease-in-out infinite}
+.chat-close{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:7px;flex-shrink:0;background:none;border:none}
+.chat-close:hover{background:rgba(255,255,255,.15)}
+.chat-close svg{width:15px;height:15px;stroke:#fff}
+.chat-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--bg-warm)}
+.chat-body .msg{max-width:84%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.5}
+.chat-body .msg.bot{background:var(--surface);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px;box-shadow:var(--sh-xs)}
+.chat-body .msg.user{background:var(--green-600);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;padding:2px 16px 14px;background:var(--bg-warm)}
+.chip{font-size:12px;font-weight:700;background:var(--surface);border:1.5px solid var(--line);padding:7px 13px;border-radius:999px;color:var(--ink-soft);transition:border-color .15s,color .15s,transform .15s var(--ease)}
+.chip:hover{border-color:var(--green-500);color:var(--green-700);transform:translateY(-1px)}
+.chat-input-row{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);background:var(--surface)}
+.chat-input-row input{flex:1;border:1.5px solid var(--line);border-radius:999px;padding:10px 15px;font-size:13.5px;background:var(--bg)}
+.chat-input-row input:focus{border-color:var(--green-500);outline:none}
+.chat-send{width:38px;height:38px;border-radius:50%;background:linear-gradient(180deg,var(--green-600),var(--green-700));border:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s var(--ease-spring)}
+.chat-send:hover{transform:scale(1.08)}
+.chat-send svg{width:16px;height:16px;stroke:#fff}
+.chat-body .typing{display:flex;gap:4px;padding:11px 14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;border-bottom-left-radius:4px;align-self:flex-start;width:fit-content}
+.chat-body .typing span{width:6px;height:6px;border-radius:50%;background:var(--ink-faint);animation:cblink2 1.2s infinite ease-in-out}
+.chat-body .typing span:nth-child(2){animation-delay:.15s}
+.chat-body .typing span:nth-child(3){animation-delay:.3s}
+.chat-docs{margin:8px 0 4px;padding-left:2px;list-style:none;display:flex;flex-direction:column;gap:6px}
+.chat-docs li{position:relative;padding-left:22px;font-size:13px;line-height:1.4}
+.chat-docs li::before{content:'';position:absolute;left:0;top:3px;width:15px;height:15px;border-radius:50%;background:var(--green-100);border:1px solid var(--green-200)}
+.chat-docs li::after{content:'';position:absolute;left:4.5px;top:7px;width:6px;height:3.5px;border-left:1.6px solid var(--green-700);border-bottom:1.6px solid var(--green-700);transform:rotate(-45deg)}
+@keyframes cblink2{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.msg-ctas{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.cta-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;background:var(--green-600);color:#fff;padding:8px 13px;border-radius:999px;border:none;cursor:pointer;text-decoration:none;font-family:inherit;transition:transform .15s var(--ease-spring),background .15s;line-height:1.2}
+.cta-btn:hover{background:var(--green-700);transform:translateY(-1px)}
+.cta-btn svg{width:12px;height:12px;flex-shrink:0}
+.cta-btn.ghost{background:var(--surface);color:var(--green-700);border:1.5px solid var(--green-300)}
+.cta-btn.ghost:hover{border-color:var(--green-500);background:var(--green-100)}
+</style>
+
+<button class="chat-launcher" id="chatLauncher" aria-label="Open Nimora AI Assistant" aria-expanded="false">
+  <span class="ping"></span><span class="dot"></span>
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.9L12 3z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg>
+</button>
+
+<div class="chat-panel" id="chatPanel" role="dialog" aria-label="Nimora AI Assistant">
+  <div class="chat-head">
+    <span class="av"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.9L12 3z"/></svg></span>
+    <div class="ti"><div class="n">Nimora AI Assistant</div><div class="s">Online</div></div>
+    <button class="chat-close" id="chatClose" aria-label="Close chat"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="chat-body" id="chatBody">
+    <div class="msg bot">Hi, I'm the Nimora Assistant 👋 Ask me anything — I'll keep answers short and point you to the right page.</div>
+  </div>
+  <div class="chips" id="chatChips">
+    <button class="chip" data-q="I want to apply for shifts">Apply for shifts</button>
+    <button class="chip" data-q="I need to find a support worker">Find support</button>
+    <button class="chip" data-q="What does it cost?">Pricing</button>
+    <button class="chip" data-q="Talk to your team">Contact us</button>
+  </div>
+  <div class="chat-input-row">
+    <input type="text" id="chatInput" placeholder="Type a message…" aria-label="Message">
+    <button class="chat-send" id="chatSend" aria-label="Send message"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   19. AI CHAT ASSISTANT — Nimora Assistant (expanded FAQ + nav)
+   ============================================================ */
+(function chatAssistant() {
+  const launcher = document.getElementById('chatLauncher');
+  const panel = document.getElementById('chatPanel');
+  const closeBtn = document.getElementById('chatClose');
+  const body = document.getElementById('chatBody');
+  const input = document.getElementById('chatInput');
+  const send = document.getElementById('chatSend');
+  const chips = document.getElementById('chatChips');
+
+  function setOpen(open) {
+    panel.classList.toggle('open', open);
+    launcher.setAttribute('aria-expanded', open);
+    if (open) input.focus();
+  }
+  launcher.addEventListener('click', () => setOpen(!panel.classList.contains('open')));
+  closeBtn.addEventListener('click', () => setOpen(false));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
+
+  const DOCS_HTML = "To get verified as a support worker on Nimora, you'll upload:"
+    + "<ul class=\"chat-docs\">"
+    + "<li>NDIS Worker Screening Check (clearance)</li>"
+    + "<li>Photo ID — driver licence or passport</li>"
+    + "<li>Right to work in Australia</li>"
+    + "<li>First Aid &amp; CPR certificate</li>"
+    + "<li>NDIS Worker Orientation Module certificate</li>"
+    + "<li>Any relevant qualifications (e.g. Cert III/IV)</li>"
+    + "<li>Bank details for pay &amp; a profile photo</li>"
+    + "</ul>"
+    + "It's all free — upload from your phone and Nimora tracks the expiry dates for you.";
+
+  /* Each rule: { test: RegExp, reply: string|{html}, ctas: [{label, href, contact?, external?}] }
+     Checked in order — first match wins. Keep replies short and clear, ChatGPT-style. */
+  const KB = [
+    { test: /\b(hi|hello|hey|g'?day|good (morning|afternoon|evening))\b/,
+      reply: "Hi there! I can help with shifts, pricing, documents or getting started — what do you need?" },
+    { test: /\bwho are you|\bwhat are you\b/,
+      reply: "I'm the Nimora Assistant — here to answer quick questions and point you to the right page." },
+    { test: /\b(thank|thanks|cheers|ta)\b/,
+      reply: "You're welcome! Anything else I can help with?" },
+    { test: /\bwhat is nimora\b|\babout nimora\b|\bwhat does nimora do\b/,
+      reply: "Nimora is an AI-powered workforce platform connecting NDIS providers, support workers and participants — for shift-filling, rostering, compliance and payments." },
+
+    /* Support worker: app / registration / shifts / pay */
+    { test: /\b(download|install|get)\b.{0,12}\bapp\b/,
+      reply: "Nimora works right in your browser — no app download needed. Register free and you can apply for shifts straight away.",
+      ctas: [{ label: 'Join as a support worker', href: 'become-a-support-worker.html#apply' }] },
+    { test: /\b(join|sign ?up|register|apply)\b.{0,20}\b(worker|shift|carer|support)\b|\bbecome a support worker\b|\bapply for shifts\b|\bwork for nimora\b/,
+      reply: "Joining as a support worker is free. Create a profile, upload your screening check, and start applying for shifts near you.",
+      ctas: [{ label: 'Join as a support worker', href: 'become-a-support-worker.html#apply' }] },
+    { test: /\bfind (a )?shifts?\b|\bshifts? near me\b|\bbrowse shifts?\b|\bavailable shifts?\b/,
+      reply: "Once registered, you'll see shifts near you ranked by distance and fit — apply in one tap.",
+      ctas: [{ label: 'Join as a support worker', href: 'become-a-support-worker.html#apply' }] },
+    { test: /\bearn|get paid|payslip|how much.{0,10}(pay|earn)|hourly rate\b/,
+      reply: "Pay is set per shift by the provider or participant, and you're paid automatically after each shift with a payslip generated for you.",
+      ctas: [{ label: 'Join as a support worker', href: 'become-a-support-worker.html#apply' }] },
+    { test: /\bdocument|screening|qualif|certificate|checks?\b.{0,20}(need|require)|what.{0,15}need to (join|register|apply)|worker screening/,
+      reply: { html: DOCS_HTML },
+      ctas: [{ label: 'Start your application', href: 'become-a-support-worker.html#apply' }] },
+
+    /* Participants */
+    { test: /\bfind (a )?support worker|need (a )?support worker|looking for (care|support)|ndis participant|request support\b/,
+      reply: "You can post what support you need and browse verified, rated support workers near you — no lock-in contracts.",
+      ctas: [{ label: 'Find support', href: 'find-support.html#request' }] },
+    { test: /\bparticipant\b/,
+      reply: "Participants and families use Nimora to find and book verified NDIS support workers directly.",
+      ctas: [{ label: 'Find support', href: 'find-support.html#request' }] },
+
+    /* Providers */
+    { test: /\bprovider|agency\b.{0,20}(sign ?up|trial|start|join)\b|\bpost (a |an )?(open )?shift\b/,
+      reply: "Providers get a 14-day free trial — post open shifts, manage rosters, and verified workers apply directly.",
+      ctas: [{ label: 'Start free trial', href: 'index.html#pricing' }] },
+    { test: /\bmarketplace\b/,
+      reply: "Post an open shift and nearby verified support workers respond — you choose who fills it, with GPS clock-in and automatic timesheets." },
+    { test: /\broster(ing)?\b/,
+      reply: "Nimora builds rosters against worker skills, participant preferences and travel time, and flags gaps early so you can post shifts before you're short.",
+      ctas: [{ label: 'See how it works', href: 'index.html#how' }] },
+
+    /* Pricing */
+    { test: /\btrial|pricing|price|cost|how much.{0,12}(cost|charge)|plans?\b|\bfree\b/,
+      reply: "Support workers are always free. Providers get a 14-day free trial, no card required, then pay commission only on filled shifts.",
+      ctas: [{ label: 'View pricing', href: 'index.html#pricing' }] },
+
+    /* Security / legal */
+    { test: /\bsecur|encrypt|gdpr|host(ed|ing)\b/,
+      reply: "All data is hosted in Australian data centres, encrypted at rest and in transit, with role-based access controls.",
+      ctas: [{ label: 'Read our data security page', href: 'data-security.html' }] },
+    { test: /\bprivacy\b/,
+      reply: "You can read our full privacy policy any time.",
+      ctas: [{ label: 'Privacy policy', href: 'privacy.html' }] },
+    { test: /\bterms\b/,
+      reply: "Our terms of use cover how the Nimora platform works for providers, workers and participants.",
+      ctas: [{ label: 'Terms of use', href: 'terms.html' }] },
+
+    /* How it works / AI */
+    { test: /\bhow (does|it) work|how.{0,10}match(ing|es)?\b|\bai\b.{0,15}(match|roster|draft|note)/,
+      reply: "Nimora matches shifts to workers by skills, distance and availability, drafts progress notes with AI, and flags roster gaps early.",
+      ctas: [{ label: 'See how it works', href: 'index.html#how' }] },
+
+    /* Contact / human */
+    { test: /\bcontact|talk to (a )?(human|someone|team|person)|call you|phone number|email you|support team|get in touch|real person\b/,
+      reply: "I can open a quick message form for you — our team replies by email.",
+      ctas: [{ label: 'Contact Nimora', href: 'index.html#contact', contact: true }] },
+
+    /* FAQ */
+    { test: /\bfaq|common questions\b/,
+      reply: "Here are answers to the most common questions.",
+      ctas: [{ label: 'View FAQ', href: 'index.html#faq' }] },
+  ];
+
+  const FALLBACK = {
+    reply: "I'm best with questions about shifts, pricing, documents or getting started on Nimora. For anything else, our team can help directly.",
+    ctas: [{ label: 'Contact Nimora', href: 'index.html#contact', contact: true }]
+  };
+
+  function matchReply(userText) {
+    const lower = userText.toLowerCase();
+    for (const rule of KB) { if (rule.test.test(lower)) return rule; }
+    return FALLBACK;
+  }
+
+  function ctaHtml(ctas) {
+    if (!ctas || !ctas.length) return '';
+    const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+    const btns = ctas.map((c, i) => {
+      const cls = i === 0 ? 'cta-btn' : 'cta-btn ghost';
+      if (c.contact) return '<a href="' + c.href + '" class="' + cls + '" data-contact="1">' + c.label + arrow + '</a>';
+      return '<a href="' + c.href + '" class="' + cls + '">' + c.label + arrow + '</a>';
+    }).join('');
+    return '<div class="msg-ctas">' + btns + '</div>';
+  }
+
+  function addMsg(content, who, ctas) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + who;
+    let html = '';
+    if (content && content.html) html = content.html; else html = escapeHtml(content);
+    html += ctaHtml(ctas);
+    div.innerHTML = html;
+    div.querySelectorAll('[data-contact]').forEach(a => a.addEventListener('click', onContactClick));
+    body.appendChild(div);
+    if (typeof HAS_GSAP !== 'undefined' && HAS_GSAP && typeof REDUCED !== 'undefined' && !REDUCED) {
+      gsap.from(div, { y: 8, opacity: 0, duration: .35, ease: 'power2.out' });
+    }
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function escapeHtml(s) {
+    const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+  }
+
+  function onContactClick(e) {
+    e.preventDefault();
+    if (typeof window.openNimoraContact === 'function') { window.openNimoraContact(); }
+    else { window.location.href = e.currentTarget.getAttribute('href'); }
+  }
+
+  function botReply(userText) {
+    const typing = document.createElement('div');
+    typing.className = 'typing';
+    typing.innerHTML = '<span></span><span></span><span></span>';
+    body.appendChild(typing);
+    body.scrollTop = body.scrollHeight;
+    const delay = (typeof REDUCED !== 'undefined' && REDUCED) ? 150 : 500 + Math.random() * 400;
+    setTimeout(() => {
+      typing.remove();
+      const rule = matchReply(userText);
+      addMsg(rule.reply, 'bot', rule.ctas);
+    }, delay);
+  }
+
+  if (chips) {
+    chips.addEventListener('click', e => {
+      const btn = e.target.closest('.chip');
+      if (!btn) return;
+      const q = btn.dataset.q || btn.textContent;
+      addMsg(btn.textContent, 'user');
+      botReply(q);
+    });
+  }
+
+  function sendMessage() {
+    const val = input.value.trim();
+    if (!val) return;
+    addMsg(val, 'user');
+    input.value = '';
+    botReply(val);
+  }
+  send.addEventListener('click', sendMessage);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+})();
+
 </script>
 </body>
 </html>
