@@ -518,8 +518,9 @@ header .btn-primary:hover{background:var(--green-100);box-shadow:0 10px 24px -8p
 @keyframes blip{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(22,161,144,.5)}50%{opacity:.5;box-shadow:0 0 0 6px rgba(22,161,144,0)}}
 .ai-log{display:flex;flex-direction:column;gap:11px;height:352px;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth}
 .ai-log::-webkit-scrollbar{display:none}
-.ai-msg{display:flex;gap:10px;align-items:flex-start;opacity:0;transform:translateY(8px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
-.ai-msg.show{opacity:1;transform:none}
+.ai-msg{display:none;gap:10px;align-items:flex-start}
+.ai-msg.show{display:flex;animation:aiIn .45s var(--ease) both}
+@keyframes aiIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .ai-msg.user{justify-content:flex-end}
 .ai-msg.user .bub{background:var(--green-600);color:#fff;border-radius:16px 16px 4px 16px;font-weight:500}
 .ai-msg .bub{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:16px 16px 16px 4px;padding:10px 15px;font-size:13px;max-width:85%}
@@ -530,8 +531,9 @@ header .btn-primary:hover{background:var(--green-100);box-shadow:0 10px 24px -8p
 .ai-msg .bub .found{display:flex;margin-top:8px}
 .ai-msg .bub .found span{width:24px;height:24px;border-radius:50%;border:2px solid var(--green-950);background:var(--green-300);color:var(--green-950);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:var(--f-display);margin-left:-7px}
 .ai-msg .bub .found span:first-child{margin-left:0}
-.ai-done{display:flex;align-items:center;gap:9px;font-family:var(--f-mono);font-size:11px;color:var(--green-300);opacity:0;transition:opacity .5s;border-top:1px dashed rgba(255,255,255,.14);padding-top:13px;margin-top:4px}
-.ai-done.show{opacity:1}
+.ai-done{display:flex;align-items:center;gap:9px;font-family:var(--f-mono);font-size:11px;color:var(--green-300);border-top:1px dashed rgba(255,255,255,.14);padding-top:13px;margin-top:4px}
+.ai-done{display:none}
+.ai-done.show{display:flex;animation:aiIn .45s var(--ease) both}
 .ai-typing{display:inline-flex;gap:4px;padding:4px 2px}
 .ai-typing i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.5);animation:tp 1.2s ease-in-out infinite}
 .ai-typing i:nth-child(2){animation-delay:.15s}
@@ -770,6 +772,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;
   background:linear-gradient(140deg,var(--green-400),transparent 40%,transparent 60%,var(--green-500));
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   -webkit-mask-composite:xor;mask-composite:exclude;
   opacity:.8;
 }
@@ -1161,8 +1164,7 @@ html.gs .rv{transition:none}                       /* GSAP drives reveals */
       <a href="#faq">FAQ</a>
     </nav>
     <div class="nav-cta">
-      <a href="#" class="nav-login">Log in</a>
-      <a href="find-support.html" class="btn btn-primary btn-sm">Find support</a>
+      <a href="#contact" data-open-contact class="btn btn-primary btn-sm">Contact us</a>
       <button class="nav-toggle" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
     </div>
   </div>
@@ -1721,7 +1723,7 @@ html.gs .rv{transition:none}                       /* GSAP drives reveals */
       <h2 class="rv" style="--rd:.06s">Flat monthly pricing.<br><span class="hl">Not per seat.</span></h2>
       <p class="rv" style="--rd:.12s">Providers pay a flat fee that doesn't balloon as the team grows — Nimora is always free for support workers.</p>
     </div>
-    <div class="founding-banner rv"><span class="txt">🎉 Providers get a 14-day free trial — no credit card required</span></div>
+    <div class="founding-banner rv"><span class="txt">🎉 Providers get a 7-day free trial after choosing a monthly or annual subscription</span></div>
     <div class="toggle-row rv" style="--rd:.06s">
       <span class="active" id="lblMonthly">Monthly</span>
       <button class="switch" id="billingSwitch" aria-label="Toggle annual billing"><div class="knob"></div></button>
@@ -1783,10 +1785,10 @@ html.gs .rv{transition:none}                       /* GSAP drives reveals */
     <div class="faq-list rv">
       <div class="faq-item open"><button class="faq-q">Is Nimora built specifically for NDIS?<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><div class="faq-a"><div class="faq-a-in">Yes — Nimora is purpose-built for NDIS providers in Australia, with a focus on Supported Independent Living. Compliance, credential tracking and Fair Work considerations are built into the workflow, not bolted on.</div></div></div>
       <div class="faq-item"><button class="faq-q">Can support workers use Nimora without a laptop?<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><div class="faq-a"><div class="faq-a-in">Yes. The Support Worker App covers everything a worker needs day to day — finding shifts, applying, clocking in with GPS, writing notes and tracking earnings — entirely from a phone.</div></div></div>
-      <div class="faq-item"><button class="faq-q">How long does onboarding take?<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><div class="faq-a"><div class="faq-a-in">Most founding providers are live within a week, with a founder-led session to import your existing roster, participants and worker credentials.</div></div></div>
+      <div class="faq-item"><button class="faq-q">How long does onboarding take?<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><div class="faq-a"><div class="faq-a-in">Most providers are live within a couple of days.</div></div></div>
       <div class="faq-item"><button class="faq-q">Is our data stored in Australia?<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><div class="faq-a"><div class="faq-a-in">Yes. All data is Australian-hosted, encrypted at rest and in transit, with role-based access controls down to the individual record.</div></div></div>
-      <div class="faq-item"><button class="faq-q">Is Nimora free for support workers?<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><div class="faq-a"><div class="faq-a-in">Always. Support workers use the app to find shifts, track earnings and manage credentials at no cost — only providers pay for Nimora.</div></div></div>
-      <div class="faq-item"><button class="faq-q">Is there a free trial for providers?<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><div class="faq-a"><div class="faq-a-in">Yes — providers get a 14-day free trial with full access and no credit card required, plus a founder-led onboarding session to import your roster. Support workers are free to join, always.</div></div></div>
+      <div class="faq-item"><button class="faq-q">Is Nimora free for support workers?<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><div class="faq-a"><div class="faq-a-in">Always. Support workers use the app to find shifts, track earnings and manage credentials at no cost.</div></div></div>
+      <div class="faq-item"><button class="faq-q">Is there a free trial for providers?<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><div class="faq-a"><div class="faq-a-in">Yes — providers get a 7-day free trial with full access after choosing a monthly or annual subscription.</div></div></div>
       <div class="faq-item"><button class="faq-q">Can we cancel anytime?<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><div class="faq-a"><div class="faq-a-in">Yes — there's no lock-in contract. You can cancel at any time from your account settings.</div></div></div>
     </div>
   </div>
@@ -2210,7 +2212,8 @@ whileVisible(payCard, () => {
     msgs.forEach(m => m.classList.remove('show'));
     done.classList.remove('show');
     steps.forEach(s => { const t = s.querySelector('.tick'); t.classList.remove('spin'); t.innerHTML = ''; });
-    log.scrollTop = 0;
+    log.style.scrollBehavior = 'auto'; log.scrollTop = 0;
+    requestAnimationFrame(() => { log.style.scrollBehavior = ''; });
   }
   const scrollLog = () => { log.scrollTop = log.scrollHeight; };
   function build(tl) {
@@ -2739,7 +2742,7 @@ document.getElementById('newsBtn').addEventListener('click', () => {
       reply: "Nimora works right in your browser — no app download needed. Register free and you can apply for shifts straight away.",
       ctas: [{ label: 'Join as a support worker', href: 'become-a-support-worker.html#apply' }] },
     { test: /\b(join|sign ?up|register|apply)\b.{0,20}\b(worker|shift|carer|support)\b|\bbecome a support worker\b|\bapply for shifts\b|\bwork for nimora\b/,
-      reply: "Joining as a support worker is free. Create a profile, upload your screening check, and start applying for shifts near you.",
+      reply: "Joining as a support worker is free. Create a profile, upload all your required documents, and start applying for shifts near you.",
       ctas: [{ label: 'Join as a support worker', href: 'become-a-support-worker.html#apply' }] },
     { test: /\bfind (a )?shifts?\b|\bshifts? near me\b|\bbrowse shifts?\b|\bavailable shifts?\b/,
       reply: "Once registered, you'll see shifts near you ranked by distance and fit — apply in one tap.",
@@ -2761,7 +2764,7 @@ document.getElementById('newsBtn').addEventListener('click', () => {
 
     /* Providers */
     { test: /\bprovider|agency\b.{0,20}(sign ?up|trial|start|join)\b|\bpost (a |an )?(open )?shift\b/,
-      reply: "Providers get a 14-day free trial — post open shifts, manage rosters, and verified workers apply directly.",
+      reply: "Providers get a 7-day free trial after choosing a monthly or annual subscription — post open shifts, manage rosters, and verified workers apply directly.",
       ctas: [{ label: 'Start free trial', href: 'index.html#pricing' }] },
     { test: /\bmarketplace\b/,
       reply: "Post an open shift and nearby verified support workers respond — you choose who fills it, with GPS clock-in and automatic timesheets." },
@@ -2771,7 +2774,7 @@ document.getElementById('newsBtn').addEventListener('click', () => {
 
     /* Pricing */
     { test: /\btrial|pricing|price|cost|how much.{0,12}(cost|charge)|plans?\b|\bfree\b/,
-      reply: "Support workers are always free. Providers get a 14-day free trial, no card required, then pay commission only on filled shifts.",
+      reply: "Support workers are always free. Providers get a 7-day free trial after choosing a monthly or annual subscription.",
       ctas: [{ label: 'View pricing', href: 'index.html#pricing' }] },
 
     /* Security / legal */
@@ -2943,6 +2946,40 @@ document.getElementById('newsBtn').addEventListener('click', () => {
     .catch(function(){msg.innerHTML='Sorry, we could not send your message. Please email us directly at <a href="mailto:'+EMAIL+'">'+EMAIL+'</a>.';msg.className='cm-msg err'})
     .finally(function(){btn.disabled=false;btn.textContent='Send message'});
   });
+})();
+</script>
+
+<style id="nimora-mobile-fixes">
+/* Lift chat above any host badge so it is never covered */
+.chat-launcher{bottom:84px !important}
+.chat-panel{bottom:158px !important;max-height:min(540px,calc(100vh - 180px)) !important}
+@supports (height:100dvh){.chat-panel{max-height:min(540px,calc(100dvh - 180px)) !important}}
+@media (max-width:720px){
+  .chat-launcher{right:16px !important;bottom:78px !important}
+  .chat-panel{right:12px !important;bottom:150px !important;width:auto !important;left:12px !important;max-width:none !important}
+}
+/* 16px inputs stop iOS/Android from zooming the page when a field is focused */
+@media (max-width:900px),(pointer:coarse){
+  input,select,textarea,.chat-input input,.chat-input-row input,.news-form input,.cm-f input,.cm-f textarea,.field input,.field select,.field textarea{font-size:16px !important}
+}
+</style>
+<script>
+(function(){
+  var vv=window.visualViewport,panel=document.getElementById('chatPanel'),launcher=document.getElementById('chatLauncher');
+  if(!vv||!panel||!launcher)return;
+  var mq=window.matchMedia('(max-width:720px)');
+  function reset(){panel.style.removeProperty('bottom');panel.style.removeProperty('max-height');launcher.style.removeProperty('opacity');launcher.style.removeProperty('pointer-events');}
+  function adjust(){
+    if(!mq.matches){reset();return;}
+    var kb=window.innerHeight-vv.height-vv.offsetTop;
+    if(kb>80){
+      panel.style.setProperty('bottom',(kb+10)+'px','important');
+      panel.style.setProperty('max-height',(vv.height-20)+'px','important');
+      launcher.style.opacity='0';launcher.style.pointerEvents='none';
+    }else{reset();}
+  }
+  vv.addEventListener('resize',adjust);vv.addEventListener('scroll',adjust);
+  document.addEventListener('focusout',function(){setTimeout(function(){adjust();window.scrollTo(window.scrollX,window.scrollY);},200);});
 })();
 </script>
 </body>
